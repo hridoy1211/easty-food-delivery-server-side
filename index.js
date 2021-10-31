@@ -20,6 +20,7 @@ async function run() {
       await client.connect();
       const database = client.db("Eatsy_Delivery_Service");
       const serviceCollection = database.collection("services");
+      const cartCollection = database.collection("cart");
       
     
       //  POST API for add Services/Offers
@@ -53,6 +54,24 @@ async function run() {
         res.json(deletedService);
       })
 
+
+
+
+      // Cart
+      // POST API for Cart
+      app.post('/cart', async(req, res) =>{
+          const result = await cartCollection.insertOne(req.body)
+          console.log(req.body);
+          console.log(result);
+          res.json(result)
+      })
+
+      // GET API for Cart
+      app.get('/cart', async(req,res) => {
+        const result = await cartCollection.find({}).toArray();
+        res.json(result)
+      })
+      // Cart
 
 
     } finally {
