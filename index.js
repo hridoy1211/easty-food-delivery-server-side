@@ -13,7 +13,7 @@ app.use(express.json())
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.kwpis.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
-console.log(uri)
+
 
 async function run() {
     try {
@@ -58,20 +58,42 @@ async function run() {
 
 
       // Cart
-      // POST API for Cart
-      app.post('/cart', async(req, res) =>{
-          const result = await cartCollection.insertOne(req.body)
-          console.log(req.body);
-          console.log(result);
-          res.json(result)
-      })
 
       // GET API for Cart
       app.get('/cart', async(req,res) => {
-        const result = await cartCollection.find({}).toArray();
+        let query = {};
+        const email = req.query.email;
+
+        if(email){
+          query = {email : email};
+        }
+        const result = await cartCollection.find(query).toArray();
+        res.send(result)
+      })
+      
+
+
+      // POST API for Cart
+      app.post('/cart', async(req, res) =>{
+        const cart = req.body
+        cart.createdAt = new Date()
+        const result = await cartCollection.insertOne(cart)
+        console.log(req.body);
+        console.log(result);
         res.json(result)
       })
-      // Cart
+      
+
+      // DELETE API for deleting orders
+      app.delete('/deletedOrder/:id', async(req,res) => {
+        const id = req.params.id;
+        const query = {_id: ObjectId(id)}
+        const deletedOrder = await cartCollection.deleteOne(query);
+        console.log(deletedOrder);
+        res.json(deletedOrder);
+      })
+
+      
 
 
     } finally {
